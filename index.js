@@ -1,9 +1,9 @@
 import express from 'express';
-import path from 'path';
 import sequelize from './config/database';
-import { create, findAll } from './models/Gif';
-import { single } from './config/multer';
+import Sign from './models/sign.model';
+import upload from './config/multer';
 import morgan from 'morgan';
+import cors from 'cors';
 
 const PORT = process.env.SIGNAPPPORT || 3000;
 const app = express();
@@ -15,7 +15,7 @@ app.use(morgan('dev'));
 app.use('/uploads', express.static('uploads'));
 
 // Endpoint para subir GIFs
-app.post('/upload', single('gif'), async (req, res) => {
+app.post('/upload', upload.single('gif'), async (req, res) => {
   try {
     if (!req.file) {
       return res
@@ -31,7 +31,7 @@ app.post('/upload', single('gif'), async (req, res) => {
       req.file.filename
     }`;
 
-    const gif = await create({
+    const gif = await Sign.create({
       keyword: req.body.keyword.toLowerCase(),
       imageUrl: imageUrl,
       originalName: req.file.originalname,
@@ -55,12 +55,12 @@ app.post('/search', async (req, res) => {
         .json({ error: 'Se requiere un texto para buscar' });
     }
 
-    const words = req.body.text.toLowerCase().split(/[\s]+/);
+    const words = req.body.text.toLowerCase().split('');
     const results = {};
 
     for (const word of words) {
       if (word.length > 0) {
-        const gifs = await findAll({
+        const gifs = await Sign.findAll({
           where: { keyword: word },
           attributes: ['imageUrl'],
         });
@@ -75,11 +75,10 @@ app.post('/search', async (req, res) => {
   }
 });
 
-
 async function initializeServer() {
   try {
     await database.authenticate();
-    await sequelize.sync({alter: true});
+    await sequelize.sync({ alter: true });
     console.log('Base de datos conectada y sincronizada');
 
     app.listen(PORT, () => {
