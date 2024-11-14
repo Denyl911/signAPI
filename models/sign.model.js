@@ -10,10 +10,6 @@ const Sign = sequelize.define('Sign', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  originalName: {
-    type: DataTypes.STRING,
-    allowNull: false
-  }
 });
 
 export default Sign;

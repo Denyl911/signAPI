@@ -55,17 +55,17 @@ app.post('/search', async (req, res) => {
         .json({ error: 'Se requiere un texto para buscar' });
     }
 
-    const words = req.body.text.toLowerCase().split('');
-    const results = {};
+    const words = req.body.text.toLowerCase().split(' ');
+    const results = [];
 
     for (const word of words) {
       if (word.length > 0) {
-        const gifs = await Sign.findAll({
+        const gifs = await Sign.findOne({
           where: { keyword: word },
-          attributes: ['imageUrl'],
+          attributes: ['keyword', 'imageUrl'],
         });
-
-        results[word] = gifs.map((gif) => gif.imageUrl);
+        results.push(gifs);
+        // results = [gifs, ...results];
       }
     }
 
