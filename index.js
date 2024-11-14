@@ -77,7 +77,7 @@ app.post('/search', async (req, res) => {
 
 async function initializeServer() {
   try {
-    await database.authenticate();
+    await sequelize.authenticate();
     await sequelize.sync({ alter: true });
     console.log('Base de datos conectada y sincronizada');
 
